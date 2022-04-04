@@ -1,8 +1,14 @@
-const Header = () => {
+const Header = ({ connect, currentAccount }) => {
   return (
-    <header className="">
+    <header className="flex justify-between">
       <div>Logo</div>
-      <div>Connect</div>
+      <div>
+        {currentAccount === "" ? (
+          <button onClick={connect}>Connect</button>
+        ) : (
+          currentAccount
+        )}
+      </div>
     </header>
   );
 };
