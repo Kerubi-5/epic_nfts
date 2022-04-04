@@ -3,6 +3,8 @@ import Card from "../components/Card";
 import { useEffect, useState } from "react";
 import Alert from "./../components/Alert";
 import Header from "../components/Header";
+import { ethers } from "ethers";
+import abi from "../util/MyEpicNFT.json";
 
 export default function Home() {
   const [modal, setModal] = useState({
@@ -43,6 +45,41 @@ export default function Home() {
     }
   };
 
+  const getConnectedContract = async () => {
+    const CONTRACT_ADDRESS = "0x03Ef82E1F9785652337d211B8a8b5d861894637b";
+    const ethereum = getWallet();
+
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      return new ethers.Contract(CONTRACT_ADDRESS, abi.abi, signer);
+    } else {
+      setModal({ show: true, message: "Ethereum object does not exist!" });
+    }
+  };
+
+  const askContractToMintNft = async () => {
+    try {
+      const connectedContract = await getConnectedContract();
+      console.log(
+        "🚀 ~ file: index.js ~ line 64 ~ askContractToMintNft ~ connectedContract",
+        connectedContract
+      );
+
+      console.log("Going to pop wallet now to pay gas...");
+      let nftTxn = await connectedContract.makeAnEpicNFT();
+
+      console.log("Mining...please wait.");
+      await nftTxn.wait();
+
+      console.log(
+        `Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     connectWallet();
   }, []);
@@ -73,6 +110,14 @@ export default function Home() {
             <small className="text-sm text-gray-400">
               Come and mint your own evil weapons now
             </small>
+            <div className="w-full group">
+              <button
+                className="py-2 px-4 gradient text-red-50 rounded-lg w-full group-hover:animate-bounce transition-all duration-300"
+                onClick={askContractToMintNft}
+              >
+                Mint NFT
+              </button>
+            </div>
           </div>
 
           <div className="shadow-sm rounded-md gradient p-4">
