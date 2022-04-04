@@ -11,7 +11,7 @@ export default function Home() {
   });
   const [currentAccount, setCurrentAccount] = useState("");
 
-  const checkIfWalletIsConnected = () => {
+  const getWallet = () => {
     /*
      * First make sure we have access to window.ethereum
      */
@@ -27,7 +27,7 @@ export default function Home() {
 
   const connectWallet = async () => {
     try {
-      const ethereum = checkIfWalletIsConnected();
+      const ethereum = getWallet();
 
       /*
        * Fancy method to request access to account.
