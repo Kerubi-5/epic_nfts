@@ -14,8 +14,13 @@ contract MyEpicNFT is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    string baseSvg =
-        "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.base { fill: white; font-family: serif; font-size: 24px; }</style><rect width='100%' height='100%' fill='black' /><text x='50%' y='50%' class='base' dominant-baseline='middle' text-anchor='middle'>";
+    // Total number of tokens we have.
+    uint256 private _totalSupply;
+
+    string svgPartOne =
+        "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.base { fill: white; font-family: serif; font-size: 24px; }</style><rect width='100%' height='100%' fill='";
+    string svgPartTwo =
+        "'/><text x='50%' y='50%' class='base' dominant-baseline='middle' text-anchor='middle'>";
 
     string[] firstWords = [
         "Lohtar's",
@@ -96,9 +101,21 @@ contract MyEpicNFT is ERC721URIStorage {
         "Whip"
     ];
 
+    string[] colors = ["red", "#08C2A8", "black", "yellow", "blue", "green"];
+
+    event NewEpicNFTMinted(address sender, uint256 tokenId);
+
     // We need to pass the name of our NFTs token and its symbol.
     constructor() ERC721("SquareNFT", "SQUARE") {
         console.log("This is my NFT contract. Woah!");
+    }
+
+    function getTotalSupply() public view returns (uint256) {
+        return _totalSupply;
+    }
+
+    function incrementSupply() public {
+        _totalSupply++;
     }
 
     // I create a function to randomly pick a word from each array.
@@ -140,6 +157,18 @@ contract MyEpicNFT is ERC721URIStorage {
         return thirdWords[rand];
     }
 
+    function pickRandomColor(uint256 tokenId)
+        public
+        view
+        returns (string memory)
+    {
+        uint256 rand = random(
+            string(abi.encodePacked("COLOR", Strings.toString(tokenId)))
+        );
+        rand = rand % colors.length;
+        return colors[rand];
+    }
+
     function random(string memory input) internal pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
     }
@@ -155,20 +184,26 @@ contract MyEpicNFT is ERC721URIStorage {
             abi.encodePacked(first, " ", second, " ", third)
         );
 
+        // Add the random color in.
+        string memory randomColor = pickRandomColor(newItemId);
+
         string memory finalSvg = string(
-            abi.encodePacked(baseSvg, combinedWord, "</text></svg>")
+            abi.encodePacked(
+                svgPartOne,
+                randomColor,
+                svgPartTwo,
+                combinedWord,
+                "</text></svg>"
+            )
         );
 
-        // Get all the JSON metadata in place and base64 encode it.
         string memory json = Base64.encode(
             bytes(
                 string(
                     abi.encodePacked(
                         '{"name": "',
-                        // We set the title of our NFT as the generated word.
                         combinedWord,
                         '", "description": "A highly acclaimed collection of squares.", "image": "data:image/svg+xml;base64,',
-                        // We add data:image/svg+xml;base64 and then append our base64 encode our svg.
                         Base64.encode(bytes(finalSvg)),
                         '"}'
                     )
@@ -176,7 +211,6 @@ contract MyEpicNFT is ERC721URIStorage {
             )
         );
 
-        // Just like before, we prepend data:application/json;base64, to our data.
         string memory finalTokenUri = string(
             abi.encodePacked("data:application/json;base64,", json)
         );
@@ -192,9 +226,11 @@ contract MyEpicNFT is ERC721URIStorage {
         );
         console.log("--------------------\n");
 
+        // Increment the supply.
+        incrementSupply();
+        require(getTotalSupply() <= 3, "Has exceeded supply limit");
         _safeMint(msg.sender, newItemId);
 
-        // Update your URI!!!
         _setTokenURI(newItemId, finalTokenUri);
 
         _tokenIds.increment();
@@ -203,5 +239,6 @@ contract MyEpicNFT is ERC721URIStorage {
             newItemId,
             msg.sender
         );
+        emit NewEpicNFTMinted(msg.sender, newItemId);
     }
 }
