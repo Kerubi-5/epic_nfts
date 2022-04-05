@@ -45,8 +45,20 @@ export default function Home() {
     }
   };
 
+  const checkNetwork = async () => {
+    const { ethereum } = window;
+    let chainId = await ethereum.request({ method: "eth_chainId" });
+    console.log("Connected to chain " + chainId);
+
+    // String, hex code of the chainId of the Rinkebey test network
+    const rinkebyChainId = "0x4";
+    if (chainId !== rinkebyChainId) {
+      alert("You are not connected to the Rinkeby Test Network!");
+    }
+  };
+
   const getConnectedContract = async () => {
-    const CONTRACT_ADDRESS = "0x03Ef82E1F9785652337d211B8a8b5d861894637b";
+    const CONTRACT_ADDRESS = "0x001B1375970433305d82cdf7bd7162C7d33507cF";
     const ethereum = getWallet();
 
     if (ethereum) {
@@ -61,11 +73,7 @@ export default function Home() {
   const askContractToMintNft = async () => {
     try {
       const connectedContract = await getConnectedContract();
-      console.log(
-        "🚀 ~ file: index.js ~ line 64 ~ askContractToMintNft ~ connectedContract",
-        connectedContract
-      );
-
+      checkNetwork();
       console.log("Going to pop wallet now to pay gas...");
       let nftTxn = await connectedContract.makeAnEpicNFT();
 
@@ -80,8 +88,24 @@ export default function Home() {
     }
   };
 
+  const getNFTS = async () => {
+    const connectedContract = await getConnectedContract();
+
+    connectedContract.on("NewEpicNFTMinted", (from, tokenId) => {
+      console.log(from, tokenId.toNumber());
+      alert(
+        `Hey there! We've minted your NFT. It may be blank right now. It can take a max of 10 min to show up on OpenSea. Here's the link: <https://testnets.opensea.io/assets/${CONTRACT_ADDRESS}/${tokenId.toNumber()}>`
+      );
+    });
+  };
+
   useEffect(() => {
     connectWallet();
+    getNFTS();
+  }, []);
+
+  useEffect(() => {
+    checkNetwork();
   }, []);
 
   return (
@@ -122,7 +146,6 @@ export default function Home() {
 
           <div className="shadow-sm rounded-md gradient p-4">
             <div className="grid grid-cols-3 gap-5">
-              <Card />
               <Card />
               <Card />
               <Card />
