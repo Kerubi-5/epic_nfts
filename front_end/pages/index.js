@@ -58,7 +58,7 @@ export default function Home() {
   };
 
   const getConnectedContract = async () => {
-    const CONTRACT_ADDRESS = "0x001B1375970433305d82cdf7bd7162C7d33507cF";
+    const CONTRACT_ADDRESS = "0xC5824d28eAeFb887a7e23d0E952e23FA5275318C";
     const ethereum = getWallet();
 
     if (ethereum) {
