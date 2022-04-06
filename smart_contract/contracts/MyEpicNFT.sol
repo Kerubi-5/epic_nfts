@@ -228,7 +228,7 @@ contract MyEpicNFT is ERC721URIStorage {
 
         // Increment the supply.
         incrementSupply();
-        require(getTotalSupply() <= 3, "Has exceeded supply limit");
+        require(getTotalSupply() <= 50, "Has exceeded supply limit");
         _safeMint(msg.sender, newItemId);
 
         _setTokenURI(newItemId, finalTokenUri);
