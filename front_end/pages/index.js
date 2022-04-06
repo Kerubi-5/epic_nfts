@@ -12,6 +12,12 @@ export default function Home() {
     message: "",
   });
   const [currentAccount, setCurrentAccount] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [nft, setNft] = useState({
+    svg: "",
+    link: "",
+  });
+  const CONTRACT_ADDRESS = "0x668AdE557b7F1002036808D9684cC557Dad02E89";
 
   const getWallet = () => {
     /*
@@ -58,7 +64,6 @@ export default function Home() {
   };
 
   const getConnectedContract = async () => {
-    const CONTRACT_ADDRESS = "0xC5824d28eAeFb887a7e23d0E952e23FA5275318C";
     const ethereum = getWallet();
 
     if (ethereum) {
@@ -77,9 +82,10 @@ export default function Home() {
       console.log("Going to pop wallet now to pay gas...");
       let nftTxn = await connectedContract.makeAnEpicNFT();
 
-      console.log("Mining...please wait.");
+      setLoading(true);
       await nftTxn.wait();
 
+      setLoading(false);
       console.log(
         `Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`
       );
@@ -91,11 +97,11 @@ export default function Home() {
   const getNFTS = async () => {
     const connectedContract = await getConnectedContract();
 
-    connectedContract.on("NewEpicNFTMinted", (from, tokenId) => {
-      console.log(from, tokenId.toNumber());
-      alert(
-        `Hey there! We've minted your NFT. It may be blank right now. It can take a max of 10 min to show up on OpenSea. Here's the link: <https://testnets.opensea.io/assets/${CONTRACT_ADDRESS}/${tokenId.toNumber()}>`
-      );
+    connectedContract.on("NewEpicNFTMinted", (from, tokenId, svg) => {
+      setNft({
+        svg: svg,
+        link: `https://testnets.opensea.io/assets/${CONTRACT_ADDRESS}/${tokenId.toNumber()}`,
+      });
     });
   };
 
@@ -119,7 +125,7 @@ export default function Home() {
         />
       </Head>
       <Header connect={connectWallet} currentAccount={currentAccount} />
-      <div className=" bg-slate-900">
+      <div className=" bg-slate-900 h-screen">
         <div className="container mx-auto px-4">
           <div className="text-center pt-24 pb-10">
             <h1 className="text-5xl stroke-1px text-transparent bg-clip-text gradient font-bold py-6">
@@ -136,7 +142,7 @@ export default function Home() {
             </small>
             <div className="w-full group">
               <button
-                className="py-2 px-4 gradient text-red-50 rounded-lg w-full group-hover:animate-bounce transition-all duration-300"
+                className="py-2 px-4 gradient text-red-50 rounded-lg w-full group-hover:animate-bounce transition-all duration-300 my-5"
                 onClick={askContractToMintNft}
               >
                 Mint NFT
@@ -144,16 +150,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="shadow-sm rounded-md gradient p-4">
-            <div className="grid grid-cols-3 gap-5">
-              <Card />
-              <Card />
-              <Card />
-              <Card />
-              <Card />
-              <Card />
+          {nft.svg && nft.link && (
+            <div className="shadow-sm rounded-md gradient p-4 flex flex-col items-center">
+              <h3 className="text-white text-2xl text-center mb-5">
+                Congrats you've minted this NFT! 🎉🎉🎉
+              </h3>
+              <Card data={nft} />
             </div>
-          </div>
+          )}
         </div>
       </div>
     </>
