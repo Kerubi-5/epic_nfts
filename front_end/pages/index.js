@@ -17,7 +17,7 @@ export default function Home() {
     svg: "",
     link: "",
   });
-  const CONTRACT_ADDRESS = "0x668AdE557b7F1002036808D9684cC557Dad02E89";
+  const CONTRACT_ADDRESS = "0x917E9d17aa20EB1c8740CA60a8c265309a516565";
 
   const getWallet = () => {
     /*
@@ -103,6 +103,8 @@ export default function Home() {
         link: `https://testnets.opensea.io/assets/${CONTRACT_ADDRESS}/${tokenId.toNumber()}`,
       });
     });
+
+    // await connectedContract.FetchTokenInfo(1)
   };
 
   useEffect(() => {
