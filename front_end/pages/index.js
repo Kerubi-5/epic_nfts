@@ -5,6 +5,7 @@ import Alert from "./../components/Alert";
 import Header from "../components/Header";
 import { ethers } from "ethers";
 import abi from "../util/MyEpicNFT.json";
+import Loader from "../components/Loader";
 
 export default function Home() {
   const [modal, setModal] = useState({
@@ -54,7 +55,6 @@ export default function Home() {
   const checkNetwork = async () => {
     const { ethereum } = window;
     let chainId = await ethereum.request({ method: "eth_chainId" });
-    console.log("Connected to chain " + chainId);
 
     // String, hex code of the chainId of the Rinkebey test network
     const rinkebyChainId = "0x4";
@@ -79,16 +79,12 @@ export default function Home() {
     try {
       const connectedContract = await getConnectedContract();
       checkNetwork();
-      console.log("Going to pop wallet now to pay gas...");
       let nftTxn = await connectedContract.makeAnEpicNFT();
 
       setLoading(true);
       await nftTxn.wait();
 
       setLoading(false);
-      console.log(
-        `Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`
-      );
     } catch (error) {
       console.log(error);
     }
@@ -127,6 +123,9 @@ export default function Home() {
         />
       </Head>
       <Header connect={connectWallet} currentAccount={currentAccount} />
+
+      {loading && <Loader />}
+
       <div className=" bg-slate-900 min-h-screen">
         <div className="container mx-auto px-4">
           <div className="text-center pt-24 pb-10">
