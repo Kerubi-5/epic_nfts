@@ -103,7 +103,7 @@ contract MyEpicNFT is ERC721URIStorage {
 
     string[] colors = ["red", "#08C2A8", "black", "yellow", "blue", "green"];
 
-    event NewEpicNFTMinted(address sender, uint256 tokenId, string svg);
+    event NewEpicNFTMinted(address sender, uint256 tokenId);
 
     // We need to pass the name of our NFTs token and its symbol.
     constructor() ERC721("SquareNFT", "SQUARE") {
@@ -239,10 +239,6 @@ contract MyEpicNFT is ERC721URIStorage {
             newItemId,
             msg.sender
         );
-        emit NewEpicNFTMinted(
-            msg.sender,
-            newItemId,
-            Base64.encode(bytes(finalSvg))
-        );
+        emit NewEpicNFTMinted(msg.sender, newItemId);
     }
 }
