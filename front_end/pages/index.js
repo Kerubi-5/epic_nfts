@@ -17,7 +17,7 @@ export default function Home() {
     svg: "",
     link: "",
   });
-  const CONTRACT_ADDRESS = "0x917E9d17aa20EB1c8740CA60a8c265309a516565";
+  const CONTRACT_ADDRESS = "0x5BA1Bb5BB7Ea27a123dE7ea060D025D774F05857";
 
   const getWallet = () => {
     /*
@@ -127,7 +127,7 @@ export default function Home() {
         />
       </Head>
       <Header connect={connectWallet} currentAccount={currentAccount} />
-      <div className=" bg-slate-900 h-screen">
+      <div className=" bg-slate-900 min-h-screen">
         <div className="container mx-auto px-4">
           <div className="text-center pt-24 pb-10">
             <h1 className="text-5xl stroke-1px text-transparent bg-clip-text gradient font-bold py-6">
