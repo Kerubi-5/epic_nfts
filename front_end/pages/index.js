@@ -154,7 +154,7 @@ export default function Home() {
           {nft.svg && nft.link && (
             <div className="shadow-sm rounded-md gradient p-4 flex flex-col items-center">
               <h3 className="text-white text-2xl text-center mb-5">
-                Congrats you've minted this NFT! 🎉🎉🎉
+                Congrats you&apos;ve minted this NFT! 🎉🎉🎉
               </h3>
               <Card data={nft} />
             </div>
